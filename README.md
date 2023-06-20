@@ -20,7 +20,7 @@ docker extension install my-extension
 
 3. The installed extension displays in your Docker desktop application:
 
-
+![modified-extension-with-switch](https://github.com/configcat-labs/configcat-with-docker-sample/assets/74829200/ecf8c78b-76da-49a5-a59d-68409538ae70)
 
 ## Learn more
 
