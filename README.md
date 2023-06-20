@@ -18,6 +18,10 @@ docker build -t my-extension .
 docker extension install my-extension
 ```
 
+3. The installed extension displays in your Docker desktop application:
+
+
+
 ## Learn more
 
 If you'd like to learn more, check out the following links:
