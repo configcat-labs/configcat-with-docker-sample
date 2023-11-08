@@ -1,6 +1,6 @@
 # ConfigCat with Docker Sample
 
-A companion repository for the blog article titled: **Using ConfigCat with Docker**.
+A companion repository for the blog article titled: **How to Use ConfigCat Feature Flags with Docker**.
 
 This sample repository contains the code for a demo Docker desktop extension. It includes the code and dependencies required to successfully use a feature flag to hide and show a child component of the extension.
 
