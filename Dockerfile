@@ -26,4 +26,4 @@ LABEL org.opencontainers.image.title="My extension" \
 COPY docker-compose.yaml .
 COPY metadata.json .
 COPY docker.svg .
-COPY --from=client-builder /ui/dist ui
+COPY --from=client-builder /ui/build ui
