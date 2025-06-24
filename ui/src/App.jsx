@@ -1,35 +1,75 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { useEffect, useState } from "react";
+import {
+	Stack,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Typography,
+} from "@mui/material";
+import { createDockerDesktopClient } from "@docker/extension-api-client";
+
+// obtain docker desktop extension client
+const ddClient = createDockerDesktopClient();
 
 function App() {
-  const [count, setCount] = useState(0)
+	const [containers, setContainers] = useState([]);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	useEffect(() => {
+		// List all containers
+		ddClient.docker.cli
+			.exec('ps', ['--all', '--format', '"{{json .}}"'])
+			.then((result) => {
+				// result.parseJsonLines() parses the output of the command into an array of objects
+				setContainers(result.parseJsonLines());
+			});
+	}, []);
+
+	return (
+		<Stack>
+			<Typography data-testid="heading" variant="h3" role="title">
+				Container list
+			</Typography>
+			<Typography
+				data-testid="subheading"
+				variant="body1"
+				color="text.secondary"
+				sx={{ mt: 2 }}
+			>
+				Simple list of containers using Docker Extensions SDK.
+			</Typography>
+			<TableContainer sx={{ mt: 2 }}>
+				<Table>
+					<TableHead>
+						<TableRow>
+							<TableCell>Contain id</TableCell>
+							<TableCell>Image</TableCell>
+							<TableCell>Command</TableCell>
+							<TableCell>Created</TableCell>
+							<TableCell>Status</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{containers.map((container) => (
+							<TableRow
+								key={container.ID}
+								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+							>
+								<TableCell>{container.ID}</TableCell>
+								<TableCell>{container.Image}</TableCell>
+								<TableCell>{container.Command}</TableCell>
+								<TableCell>{container.CreatedAt}</TableCell>
+								<TableCell>{container.Status}</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</TableContainer>
+		</Stack>
+	);
 }
 
-export default App
+export default App;
