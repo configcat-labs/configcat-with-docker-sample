@@ -10,16 +10,18 @@ import {
 	TableRow,
 	Typography,
 	Switch,
-  FormControlLabel,
-  FormGroup,
+	FormControlLabel,
+	FormGroup,
 } from "@mui/material";
 import { createDockerDesktopClient } from "@docker/extension-api-client";
+import { useFeatureFlag } from "configcat-react";
 
 // obtain docker desktop extension client
 const ddClient = createDockerDesktopClient();
 
 function App() {
 	const [containers, setContainers] = useState([]);
+	const { value: isFilterSwitchEnabled } = useFeatureFlag("filterSwitch", false);
 
 	function fetchAllContainers() {
 		ddClient.docker.cli
@@ -39,14 +41,17 @@ function App() {
 			});
 	}
 
+	function handleFetchContainers(event) {
+		if (event.target.checked) {
+			fetchRunningContainers();
+		} else {
+			fetchAllContainers();
+		}
+	}
+
 	useEffect(() => {
 		// List all containers
-		ddClient.docker.cli
-			.exec("ps", ["--all", "--format", '"{{json .}}"'])
-			.then((result) => {
-				// result.parseJsonLines() parses the output of the command into an array of objects
-				setContainers(result.parseJsonLines());
-			});
+		fetchAllContainers();
 	}, []);
 
 	return (
@@ -62,6 +67,8 @@ function App() {
 			>
 				Simple list of containers using Docker Extensions SDK.
 			</Typography>
+			{
+				isFilterSwitchEnabled &&
 			<FormGroup sx={{ mt: 1 }}>
 				<FormControlLabel
 					control={
@@ -70,6 +77,7 @@ function App() {
 					label="Show only running containers"
 				/>
 			</FormGroup>
+			}
 			<TableContainer sx={{ mt: 2 }}>
 				<Table>
 					<TableHead>
