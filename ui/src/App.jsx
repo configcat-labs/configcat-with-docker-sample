@@ -9,6 +9,9 @@ import {
 	TableHead,
 	TableRow,
 	Typography,
+	Switch,
+  FormControlLabel,
+  FormGroup,
 } from "@mui/material";
 import { createDockerDesktopClient } from "@docker/extension-api-client";
 
@@ -18,10 +21,28 @@ const ddClient = createDockerDesktopClient();
 function App() {
 	const [containers, setContainers] = useState([]);
 
+	function fetchAllContainers() {
+		ddClient.docker.cli
+			.exec("ps", ["--all", "--format", '"{{json .}}"'])
+			.then((result) => {
+				// result.parseJsonLines() parses the output of the command into an array of objects
+				setContainers(result.parseJsonLines());
+			});
+	}
+
+	function fetchRunningContainers() {
+		ddClient.docker.cli
+			.exec("ps", ["--format", '"{{json .}}"'])
+			.then((result) => {
+				// result.parseJsonLines() parses the output of the command into an array of objects
+				setContainers(result.parseJsonLines());
+			});
+	}
+
 	useEffect(() => {
 		// List all containers
 		ddClient.docker.cli
-			.exec('ps', ['--all', '--format', '"{{json .}}"'])
+			.exec("ps", ["--all", "--format", '"{{json .}}"'])
 			.then((result) => {
 				// result.parseJsonLines() parses the output of the command into an array of objects
 				setContainers(result.parseJsonLines());
@@ -41,6 +62,14 @@ function App() {
 			>
 				Simple list of containers using Docker Extensions SDK.
 			</Typography>
+			<FormGroup sx={{ mt: 1 }}>
+				<FormControlLabel
+					control={
+						<Switch onChange={(event) => handleFetchContainers(event)} />
+					}
+					label="Show only running containers"
+				/>
+			</FormGroup>
 			<TableContainer sx={{ mt: 2 }}>
 				<Table>
 					<TableHead>
@@ -56,7 +85,7 @@ function App() {
 						{containers.map((container) => (
 							<TableRow
 								key={container.ID}
-								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+								sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
 							>
 								<TableCell>{container.ID}</TableCell>
 								<TableCell>{container.Image}</TableCell>
